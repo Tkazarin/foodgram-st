@@ -8,63 +8,131 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Favorite',
+            name="Favorite",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Рецепт в избранном',
-                'verbose_name_plural': 'Рецепты в избранном',
-                'ordering': ('user',),
-                'default_related_name': 'favorites',
+                "verbose_name": "Рецепт в избранном",
+                "verbose_name_plural": "Рецепты в избранном",
+                "ordering": ("user",),
+                "default_related_name": "favorites",
             },
         ),
         migrations.CreateModel(
-            name='Recipe',
+            name="Recipe",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=256, verbose_name='Название')),
-                ('text', models.TextField(verbose_name='Описание')),
-                ('cooking_time', models.PositiveIntegerField(validators=[django.core.validators.MinValueValidator(1)], verbose_name='Время приготовления')),
-                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='Дата публикации')),
-                ('short_link', models.CharField(blank=True, null=True, unique=True, verbose_name='Короткая ссылка')),
-                ('image', models.ImageField(upload_to='recipes/pics/', verbose_name='Изображение')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(max_length=256, verbose_name="Название"),
+                ),
+                ("text", models.TextField(verbose_name="Описание")),
+                (
+                    "cooking_time",
+                    models.PositiveIntegerField(
+                        validators=[
+                            django.core.validators.MinValueValidator(1)
+                        ],
+                        verbose_name="Время приготовления",
+                    ),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(
+                        auto_now_add=True, verbose_name="Дата публикации"
+                    ),
+                ),
+                (
+                    "short_link",
+                    models.CharField(
+                        blank=True,
+                        null=True,
+                        unique=True,
+                        verbose_name="Короткая ссылка",
+                    ),
+                ),
+                (
+                    "image",
+                    models.ImageField(
+                        upload_to="recipes/pics/", verbose_name="Изображение"
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Рецепт',
-                'verbose_name_plural': 'Рецепты',
-                'ordering': ('-created_at',),
-                'default_related_name': 'recipes',
+                "verbose_name": "Рецепт",
+                "verbose_name_plural": "Рецепты",
+                "ordering": ("-created_at",),
+                "default_related_name": "recipes",
             },
         ),
         migrations.CreateModel(
-            name='RecipeIngredient',
+            name="RecipeIngredient",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('amount', models.PositiveIntegerField(validators=[django.core.validators.MinValueValidator(1)], verbose_name='Количество')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "amount",
+                    models.PositiveIntegerField(
+                        validators=[
+                            django.core.validators.MinValueValidator(1)
+                        ],
+                        verbose_name="Количество",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Ингридиенты рецепта',
-                'verbose_name_plural': 'Ингридиенты рецепта',
-                'ordering': ('ingredient',),
-                'default_related_name': 'recipe_ingredients',
+                "verbose_name": "Ингридиенты рецепта",
+                "verbose_name_plural": "Ингридиенты рецепта",
+                "ordering": ("ingredient",),
+                "default_related_name": "recipe_ingredients",
             },
         ),
         migrations.CreateModel(
-            name='ShoppingCart',
+            name="ShoppingCart",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Список покупок',
-                'verbose_name_plural': 'Список покупок',
-                'ordering': ('user',),
-                'default_related_name': 'shopping_carts',
+                "verbose_name": "Список покупок",
+                "verbose_name_plural": "Список покупок",
+                "ordering": ("user",),
+                "default_related_name": "shopping_carts",
             },
         ),
     ]

@@ -4,16 +4,18 @@ from ingredients.models import Ingredient
 
 
 class CustomRecipeFilter(FilterSet):
-    is_favorited = filters.BooleanFilter(method='filter_by_favorite_status')
-    is_in_shopping_cart = filters.BooleanFilter(method='filter_by_cart_status')
+    is_favorited = filters.BooleanFilter(method="filter_by_favorite_status")
+    is_in_shopping_cart = filters.BooleanFilter(method="filter_by_cart_status")
 
     class Meta:
         model = Recipe
-        fields = ('author', 'is_favorited', 'is_in_shopping_cart')
+        fields = ("author", "is_favorited", "is_in_shopping_cart")
 
     def get_current_user(self):
         request = self.request
-        return request.user if request and request.user.is_authenticated else None
+        return (
+            request.user if request and request.user.is_authenticated else None
+        )
 
     def filter_by_favorite_status(self, queryset, field_name, should_filter):
         user = self.get_current_user()
@@ -29,8 +31,8 @@ class CustomRecipeFilter(FilterSet):
 
 
 class CustomIngredientFilter(FilterSet):
-    name = filters.CharFilter(lookup_expr='istartswith')
+    name = filters.CharFilter(lookup_expr="istartswith")
 
     class Meta:
         model = Ingredient
-        fields = ['name']
+        fields = ["name"]

@@ -6,7 +6,9 @@ from django.core.files.base import ContentFile
 
 
 class Base64EncodedImageField(serializers.ImageField):
-    def __init__(self, *args, file_prefix='file', max_filename_length=None, **kwargs):
+    def __init__(
+        self, *args, file_prefix="file", max_filename_length=None, **kwargs
+    ):
         self.file_prefix = file_prefix
         self.max_filename_length = max_filename_length
         super().__init__(*args, **kwargs)
