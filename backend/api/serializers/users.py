@@ -1,10 +1,9 @@
 from rest_framework import serializers
 
 from users.models import User, Subscription
+from recipes.models import Recipe
 
 from api.serializers.general import Base64EncodedImageField
-from api.serializers.recipes import RecipeMiniDisplaySerializer
-
 
 class UserAvatarSerializer(serializers.ModelSerializer):
     avatar = Base64EncodedImageField(allow_null=True, file_prefix='avatar')
@@ -33,7 +32,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
     def get_is_subscribed(self, user_obj):
         request_user = self.context.get('request').user
         if request_user.is_authenticated:
-            return request_user.subscribers.filter(author=user_obj).exists()
+            return user_obj.followers.filter(subscriber=request_user).exists()
         return False
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -66,10 +65,10 @@ class SubscriptionDetailSerializer(serializers.ModelSerializer):
             "username",
             "first_name",
             "last_name",
-            "is_subscribed",
             "recipes",
             "recipes_count",
             "avatar",
+            "is_subscribed",
         )
 
     def get_recipes(self, author):
@@ -83,6 +82,9 @@ class SubscriptionDetailSerializer(serializers.ModelSerializer):
             many=True,
             context={"request": request}
         ).data
+
+    def get_recipes_count(self, obj):
+        return obj.recipes.count()
 
 
 class SubscriptionCreateSerializer(serializers.ModelSerializer):
@@ -101,3 +103,15 @@ class SubscriptionCreateSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         request = self.context.get("request")
         return SubscriptionDetailSerializer(instance.author, context={"request": request}).data
+
+class RecipeMiniDisplaySerializer(serializers.ModelSerializer):
+    image = Base64EncodedImageField(required=True, allow_null=False)
+
+    class Meta:
+        model = Recipe
+        fields = (
+            'id',
+            'name',
+            'image',
+            'cooking_time',
+        )

@@ -166,7 +166,6 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": PAGE_SIZE,
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 AUTH_USER_MODEL = 'users.User'
@@ -174,6 +173,9 @@ AUTH_USER_MODEL = 'users.User'
 DJOSER = {
     'LOGIN_FIELD': 'email',
     'SERIALIZERS': {
+        'user_create': 'api.serializers.users.UserCreateSerializer',
+        'user': 'api.serializers.users.UserDetailSerializer',
+        'current_user': 'api.serializers.users.UserDetailSerializer',
     },
     'PERMISSIONS': {
         'user': ('rest_framework.permissions.IsAuthenticatedOrReadOnly',),
