@@ -40,8 +40,14 @@ SECRET_KEY = (
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    'backend',
+    'http://localhost:8080'
+]
 
+CSRF_TRUSTED_ORIGINS = ['http://localhost:8080']
 
 # Application definition
 
@@ -99,10 +105,10 @@ WSGI_APPLICATION = "foodgram_back.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("POSTGRES_DB", "foodgram_backend"),
-        "USER": os.getenv("POSTGRES_USER", ""),
-        "PASSWORD": os.getenv("POSTGRES_PASSWORD", ""),
-        "HOST": os.getenv("DB_HOST", ""),
+        "NAME": os.getenv("DB_NAME", "foodgram-backend"),
+        "USER": os.getenv("DB_USER"),
+        "PASSWORD": os.getenv("DB_PASSWORD"),
+        "HOST": os.getenv("DB_HOST"),
         "PORT": os.getenv("DB_PORT", 5432),
     }
 }
@@ -148,8 +154,7 @@ STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "all_static"
 
 MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-
+MEDIA_ROOT = BASE_DIR / "media"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
