@@ -27,7 +27,7 @@ from recipes.models import (
     ShoppingCart,
 )
 from ingredients.models import Ingredient
-from users.models import Subscription, User
+from users.models import User
 
 from api.serializers.ingredients import IngredientSerializer
 from api.serializers.recipes import (
@@ -139,7 +139,6 @@ class UserActionsViewSet(AuthUserViewSet):
             context={"request": request},
         )
         serializer.is_valid(raise_exception=True)
-        subscription = serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def delete_subscription(self, request, author):

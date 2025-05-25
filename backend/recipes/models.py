@@ -1,4 +1,4 @@
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import MinValueValidator
 from django.db import models
 
 from foodgram_back.settings import (
@@ -7,7 +7,6 @@ from foodgram_back.settings import (
     MAX_RECIPE_NAME_LENGTH,
 )
 from users.models import User
-from ingredients.models import Ingredient
 
 
 class Recipe(models.Model):
