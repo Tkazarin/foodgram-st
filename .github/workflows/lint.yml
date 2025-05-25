@@ -2,7 +2,7 @@ name Check Flake8
 
 on:
   push:
-    branches:  main 
+    branches:  [ main ]
   pull_request:
     branches: [ main ]
 
