@@ -10,6 +10,12 @@ from api.serializers.users import (
 )
 
 
+from foodgram_back.settings import (
+    MIN_COOKING_TIME, MAX_COOKING_TIME,
+    MAX_INGREDIENT_AMOUNT, MIN_INGREDIENT_AMOUNT
+)
+
+
 class RecipeIngredientDetailSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(source="ingredient.id")
     name = serializers.CharField(source="ingredient.name")
@@ -26,17 +32,19 @@ class RecipeIngredientCreateSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(
         queryset=Ingredient.objects.all(), source="ingredient"
     )
+    amount = serializers.IntegerField(
+        min_value=MIN_INGREDIENT_AMOUNT, max_value=MAX_INGREDIENT_AMOUNT,
+        error_messages={
+            "min_value":
+                f"Количество должно быть не менее {MIN_INGREDIENT_AMOUNT}.",
+            "max_value":
+                f"Количество не может превышать {MAX_INGREDIENT_AMOUNT}."
+        }
+    )
 
     class Meta:
         model = RecipeIngredient
         fields = ("id", "amount")
-
-    def validate_amount(self, value):
-        if not value:
-            raise serializers.ValidationError(
-                "Отсутствует обязательное количество."
-            )
-        return value
 
 
 class RecipeDetailSerializer(serializers.ModelSerializer):
@@ -89,6 +97,17 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         many=True, source="recipe_ingredients"
     )
     image = Base64EncodedImageField(required=True, file_prefix="recipe")
+    cooking_time = serializers.IntegerField(
+        min_value=MIN_COOKING_TIME, max_value=MAX_COOKING_TIME,
+        error_messages={
+            "min_value":
+                f"Время готовки не может быть меньше "
+                f"{MIN_COOKING_TIME} минуты.",
+            "max_value":
+                f"Время готовки не может превышать "
+                f"{MAX_COOKING_TIME} минут."
+        }
+    )
 
     class Meta:
         model = Recipe
@@ -118,22 +137,13 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             )
 
         errors = []
-        for idx, ingredient in enumerate(ingredient_list):
-            if not ingredient.get("amount"):
-                errors.append({"amount": "Обязательное поле.", "index": idx})
 
         if errors:
             raise serializers.ValidationError({"ingredients": errors})
 
         return data
 
-    def create(self, validated_data):
-        ingredient_data = validated_data.pop("recipe_ingredients")
-        user = self.context["request"].user
-
-        validated_data.pop("author", None)
-
-        recipe = Recipe.objects.create(author=user, **validated_data)
+    def create_ingredients(self, recipe, ingredient_data):
         recipe_ingredients = [
             RecipeIngredient(
                 recipe=recipe,
@@ -143,17 +153,21 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             for ingredient in ingredient_data
         ]
         RecipeIngredient.objects.bulk_create(recipe_ingredients)
+
+    def create(self, validated_data):
+        ingredient_data = validated_data.pop("recipe_ingredients")
+        user = self.context["request"].user
+
+        validated_data.pop("author", None)
+
+        recipe = Recipe.objects.create(author=user, **validated_data)
+        self.create_ingredients(recipe, ingredient_data)
         return recipe
 
     def update(self, instance, validated_data):
         ingredient_data = validated_data.pop("recipe_ingredients")
         instance.recipe_ingredients.all().delete()
-        RecipeIngredient.objects.bulk_create(
-            [
-                RecipeIngredient(recipe=instance, **ingredient)
-                for ingredient in ingredient_data
-            ]
-        )
+        self.create_ingredients(instance, ingredient_data)
         updated_recipe = super().update(instance, validated_data)
         return updated_recipe
 

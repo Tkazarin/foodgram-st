@@ -51,9 +51,9 @@ class UserActionsViewSet(AuthUserViewSet):
     def get_serializer_class(self):
         if self.action == "create":
             return UserRegistrationSerializer
-        elif self.action == "avatar":
+        if self.action == "avatar":
             return UserAvatarSerializer
-        elif self.action in ["subscriptions", "subscribe"]:
+        if self.action in ["subscriptions", "subscribe"]:
             if self.request.method == "POST":
                 return SubscriptionCreateSerializer
             return SubscriptionDetailSerializer
@@ -130,15 +130,15 @@ class UserActionsViewSet(AuthUserViewSet):
 
         if request.method == "POST":
             return self.create_subscription(request, author)
-        else:
-            return self.delete_subscription(request, author)
+        return self.delete_subscription(request, author)
 
     def create_subscription(self, request, author):
-        serializer = self.get_serializer(
+        serializer = SubscriptionCreateSerializer(
             data={"subscriber": request.user.id, "author": author.id},
             context={"request": request},
         )
         serializer.is_valid(raise_exception=True)
+        serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def delete_subscription(self, request, author):
@@ -198,10 +198,9 @@ class RecipeAPIViewSet(viewsets.ModelViewSet):
                 duplicate_message,
                 req,
             )
-        else:
-            return self.remove_relation(
-                current_user, recipe_id, relation_model
-            )
+        return self.remove_relation(
+            current_user, recipe_id, relation_model
+        )
 
     def add_relation(
         self, user, recipe, model, serializer_class, error_msg, request
@@ -277,12 +276,10 @@ class RecipeAPIViewSet(viewsets.ModelViewSet):
             user = self.request.user
             queryset = queryset.annotate(
                 is_favorited=Exists(
-                    Favorite.objects.filter(user=user, recipe=OuterRef("pk"))
+                    user.favorites.filter(recipe=OuterRef("pk"))
                 ),
                 is_in_shopping_cart=Exists(
-                    ShoppingCart.objects.filter(
-                        user=user, recipe=OuterRef("pk")
-                    )
+                    user.shopping_carts.filter(recipe=OuterRef("pk"))
                 ),
             )
 
@@ -322,7 +319,8 @@ class RecipeAPIViewSet(viewsets.ModelViewSet):
 
     def create_shopping_list_file(self, ingredients):
         list_content = "\n".join(
-            f'{item["ingredient__name"]} - {item["total_amount"]} {item["ingredient__measurement_unit"]}'
+            f'{item["ingredient__name"]} - {item["total_amount"]} \
+        {item["ingredient__measurement_unit"]}'
             for item in ingredients
         )
         file_buffer = BytesIO()

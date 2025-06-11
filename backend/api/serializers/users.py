@@ -33,7 +33,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
         ]
 
     def get_is_subscribed(self, user_obj):
-        request_user = self.context.get("request").user
+        request_user = self.context["request"].user
         if request_user.is_authenticated:
             return user_obj.followers.filter(subscriber=request_user).exists()
         return False
@@ -101,9 +101,7 @@ class SubscriptionCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 "Нельзя подписаться на самого себя."
             )
-        if Subscription.objects.filter(
-            subscriber=current_user, author=author
-        ).exists():
+        if current_user.subscriptions.filter(author=author).exists():
             raise serializers.ValidationError(
                 "Вы уже подписаны на этого автора."
             )
@@ -111,9 +109,16 @@ class SubscriptionCreateSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         request = self.context.get("request")
+        if isinstance(instance, dict):
+            author = instance.get("author")
+        else:
+            author = instance.author
         return SubscriptionDetailSerializer(
-            instance.author, context={"request": request}
+            author, context={"request": request}
         ).data
+
+    def create(self, validated_data):
+        return Subscription.objects.create(**validated_data)
 
 
 class RecipeMiniDisplaySerializer(serializers.ModelSerializer):

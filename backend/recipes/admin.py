@@ -34,7 +34,8 @@ class RecipeAdmin(admin.ModelAdmin):
     def image_display(self, recipe):
         if recipe.image and hasattr(recipe.image, "url"):
             return mark_safe(
-                f'<img src="{recipe.image.url}" style="max-width: 70px; max-height: 70px; object-fit: cover;" />'
+                f'<img src="{recipe.image.url}" style="max-width: 70px; '
+                f'max-height: 70px; object-fit: cover;" />'
             )
         return "Нет изображения"
 

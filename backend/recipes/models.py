@@ -1,10 +1,12 @@
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
 from foodgram_back.settings import (
     MIN_INGREDIENT_AMOUNT,
     MIN_COOKING_TIME,
     MAX_RECIPE_NAME_LENGTH,
+    MAX_COOKING_TIME,
+    MAX_INGREDIENT_AMOUNT,
 )
 from users.models import User
 
@@ -20,9 +22,12 @@ class Recipe(models.Model):
         verbose_name="Ингредиенты",
     )
     text = models.TextField("Описание")
-    cooking_time = models.PositiveIntegerField(
+    cooking_time = models.PositiveSmallIntegerField(
         "Время приготовления",
-        validators=[MinValueValidator(MIN_COOKING_TIME)],
+        validators=[
+            MinValueValidator(MIN_COOKING_TIME),
+            MaxValueValidator(MAX_COOKING_TIME)
+        ],
     )
     created_at = models.DateTimeField(
         "Дата публикации",
@@ -54,8 +59,12 @@ class RecipeIngredient(models.Model):
         verbose_name="Ингредиент",
         on_delete=models.CASCADE,
     )
-    amount = models.PositiveIntegerField(
-        "Количество", validators=(MinValueValidator(MIN_INGREDIENT_AMOUNT),)
+    amount = models.PositiveSmallIntegerField(
+        "Количество",
+        validators=[
+            MinValueValidator(MIN_INGREDIENT_AMOUNT),
+            MaxValueValidator(MAX_INGREDIENT_AMOUNT)
+        ]
     )
 
     class Meta:
@@ -89,7 +98,8 @@ class ShoppingCart(models.Model):
         ]
 
     def __str__(self):
-        return f"Список покупок нужных инградиентов пользователя {self.user} для рецепта {self.recipe}"
+        return (f"Список покупок нужных инградиентов пользователя {self.user} "
+                f"для рецепта {self.recipe}")
 
 
 class Favorite(models.Model):
